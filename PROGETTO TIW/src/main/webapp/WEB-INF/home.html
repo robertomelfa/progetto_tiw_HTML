@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
     <head>
         <link rel="stylesheet" href="CSS/homestyle.css">
         <title>Home Page</title>
@@ -18,6 +18,18 @@
         <div id="treebox">
             <p>Albero</p>
         </div>
+        <div th:if="${categories.size() >0}">
+		<table>
+			<tbody>
+				<tr th:each="c : ${categories}">
+					<td th:if ="${c.father != 0}" th:text="${c.father.toString() + c.category.toString()}"></td>
+					<td th:if ="${c.father == 0}" th:text="${c.category.toString()}"></td>
+					<td th:text="${ c.name }"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>  
+	<div th:if="${categories.size() == 0}"> No categories were created.</div>
         <div>
             <div>
                 <a id="newcatlabel">Nuova categoria</a>

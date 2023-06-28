@@ -16,7 +16,7 @@ public class CategoriesDAO {
 		this.con = connection;
 	}
 
-	public List<Categories> findUser() throws SQLException {
+	public List<Categories> findCategory() throws SQLException {
 
 		List<Categories> categories = new ArrayList<Categories>();
 

@@ -1,33 +1,30 @@
 package it.polimi.tiw.controllers;
+
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.UnavailableException;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
-import it.polimi.tiw.dao.UsersDAO;
-import it.polimi.tiw.data.userData;
+import it.polimi.tiw.dao.CategoriesDAO;
+import it.polimi.tiw.data.Categories;
 import it.polimi.tiw.utils.DBHandler;
 
-/**
- * Servlet implementation class CheckLogin
- */
-@WebServlet("/CheckLogin")
-public class CheckLogin extends HttpServlet {
+@WebServlet("/GoHome")
+public class GoHome extends HttpServlet{
+	
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	private Connection connection = null;
@@ -43,42 +40,33 @@ public class CheckLogin extends HttpServlet {
 		
 		connection = DBHandler.getConnection(getServletContext());
 	}
-
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	
 		
-		String name = request.getParameter("username");
-		String password = request.getParameter("password");
-		
-		UsersDAO us = new UsersDAO(connection);
-		List<userData> users = new ArrayList<userData>();
-		
-		if(name == null || name.isEmpty() || password == null || password.isEmpty()) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Missing parameter");
-			return;
-		}
+		CategoriesDAO categoriesDAO = new CategoriesDAO(connection);
+		List<Categories> categories = new ArrayList<Categories>();
 		
 		try {
-			users = us.findUser();
-		} catch (SQLException e) {
+			categories = categoriesDAO.findCategory();
+		}catch (SQLException e) {
 			e.printStackTrace();
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Issue when reading courses from db");
 			return;
 		}
+		
+		// Redirect to the Home page and add missions to the parameters
+		String path = "/WEB-INF/home.html";
+		ServletContext servletContext = getServletContext();
+		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+		ctx.setVariable("categories", categories);
+		templateEngine.process(path, ctx, response.getWriter());
+		
+	}
 	
-		boolean check = false;
-		
-		for(userData user : users) {
-			if(user.getName().equals(name) && user.getPassword().equals(password)){
-				check = true;
-			}
-		}
-		
-		if(check == false) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "credentials does not exist");
-			return;
-		}
-		
-		response.sendRedirect("GoHome");
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doGet(request, response);
 	}
 	
 	public void destroy() {
