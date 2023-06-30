@@ -53,11 +53,9 @@ DROP TABLE IF EXISTS `categories`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `categories` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `category` int NOT NULL CHECK (category >= 1 AND category <= 9),
+  `category` varchar(9),
   `name` varchar(45) NOT NULL,
-  `father` int,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (father) REFERENCES categories(id)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -67,9 +65,33 @@ CREATE TABLE `categories` (
 
 LOCK TABLES `categories` WRITE;
 /*!40000 ALTER TABLE `categories` DISABLE KEYS */;
-INSERT INTO `categories` VALUES (1, 9,'materiali solidi', 1),(2, 1,'materiali inerti',1),(3,1,'inerti da edilizia',2),(4,1,'amianto',3),(5,1,'amianto in lastre',4), (6, 1,'amianto in frammenti',4), (7, 2,'materiali cementizi',2), (9, 2,'inerti ceramici',1), (10, 1,'piastrelle',3);
+INSERT INTO `categories` VALUES (1, '9','materiali solidi'),(2, '91','materiali inerti'),(3,'911','inerti da edilizia'),(4,'9111','amianto'),(5,'91111','amianto in lastre'), (6, '91112','amianto in frammenti'), (7, '9112','materiali cementizi'), (8, '912','inerti ceramici'), (9, '9121','piastrelle');
 /*!40000 ALTER TABLE `categories` ENABLE KEYS */;
 UNLOCK TABLES;
+
+
+DROP TABLE IF EXISTS `categoriesRelation`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `categoriesRelation` (
+  `id` int NOT NULL,
+  `father` int,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (id) REFERENCES categories(id) ON UPDATE CASCADE ON DELETE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `degree`
+--
+
+LOCK TABLES `categoriesRelation` WRITE;
+/*!40000 ALTER TABLE `categoriesRelation` DISABLE KEYS */;
+INSERT INTO `categoriesRelation` VALUES (1, null),(2, 1),(3,2),(4,3),(5,4), (6,4), (7,3), (8, 1), (9,3);
+/*!40000 ALTER TABLE `categoriesRelation` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
@@ -101,5 +123,3 @@ DELIMITER ;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2022-03-21 16:43:03
