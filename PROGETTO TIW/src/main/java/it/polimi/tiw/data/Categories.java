@@ -1,10 +1,14 @@
 package it.polimi.tiw.data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Categories {
 	private int id;
-	private int category;
+	private String category;
 	private String name;
 	private int father;
+	private List<Categories> subCategories = new ArrayList<Categories>();
 	
 	public Categories() {
 		super();
@@ -18,11 +22,11 @@ public class Categories {
 		return this.id;
 	}
 	
-	public void setCategory(int category) {
+	public void setCategory(String category) {
 		this.category = category;
 	}
 	
-	public int getCategory() {
+	public String getCategory() {
 		return this.category;
 	}
 	
@@ -40,5 +44,13 @@ public class Categories {
 	
 	public int getFather() {
 		return this.father;
+	}
+	
+	public void addSubCategory(Categories category) {
+		subCategories.add(category);
+	}
+	
+	public List<Categories> getSubCategories(){
+		return subCategories;
 	}
 }

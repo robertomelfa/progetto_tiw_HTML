@@ -18,27 +18,27 @@
         <div id="treebox">
             <p>Albero</p>
         </div>
-        <div th:if="${categories.size() >0}">
-		<table>
-			<tbody>
-				<tr th:each="c : ${categories}">
-					<td th:if ="${c.father != 0}" th:text="${c.father.toString() + c.category.toString()}"></td>
-					<td th:if ="${c.father == 0}" th:text="${c.category.toString()}"></td>
-					<td th:text="${ c.name }"></td>
-				</tr>
-			</tbody>
-		</table>
-	</div>  
-	<div th:if="${categories.size() == 0}"> No categories were created.</div>
+		
+		<div>
+		
+		 <ul th:fragment="fragment_category(categories)" >
+     		<li th:each="c : ${categories.getSubCategories()}" th:inline="text">
+         		<span th:text="${c.category + ' ' + c.name + ' >>> '}"></span>
+         		<a href="CopyCategory?id=(c.id}">copia</a>
+         		<ul th:replace="this::fragment_category(${c})"></ul>
+     		</li>
+ 		</ul>
+		</div>
+			
         <div>
             <div>
-                <a id="newcatlabel">Nuova categoria</a>
-                <div id="inputbox">
-                    <input type="text" placeholder="Nome categoria">
-                    <input type="text" placeholder="Categoria padre">
-                    <button id="addcategory">Aggiungi categoria</button>
-                    
-                </div>
+                <p>Inserisci nuova categoria</p>
+				<form action="AddCategory" method="POST">
+					<input type="text" placeholder = "Nome Categoria" name = "name" id = "name"> <br>
+					<input  type = "text" placeholder = "Nome Padre" name = "father" id ="father"><br>
+					<input  type="submit" value="login">
+				</form>
+				<p id="errormessage" class="error"></p>
 
             </div>
         </div>

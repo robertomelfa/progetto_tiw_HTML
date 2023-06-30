@@ -14,18 +14,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import it.polimi.tiw.dao.CategoriesDAO;
+import it.polimi.tiw.dao.UsersDAO;
 import it.polimi.tiw.data.Branch;
 import it.polimi.tiw.data.Categories;
+import it.polimi.tiw.data.userData;
 import it.polimi.tiw.utils.DBHandler;
 
-@WebServlet("/GoHome")
-public class GoHome extends HttpServlet{
-	
+/**
+ * Servlet implementation class AddCategory
+ */
+@WebServlet("/AddCategory")
+public class AddCategory extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	private Connection connection = null;
@@ -42,8 +45,28 @@ public class GoHome extends HttpServlet{
 		connection = DBHandler.getConnection(getServletContext());
 	}
 	
+    public AddCategory() {
+        super();
+    }
+
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	
+
+		
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String name = request.getParameter("name");
+		String father = request.getParameter("father");
+		
+		
+		if(name == null || name.isEmpty() || father == null || father.isEmpty()) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Missing parameter");
+			return;
+		}
 		
 		CategoriesDAO categoriesDAO = new CategoriesDAO(connection);
 		List<Categories> categories = new ArrayList<Categories>();
@@ -56,28 +79,41 @@ public class GoHome extends HttpServlet{
 			return;
 		}
 		
-		Branch tree = new Branch();
-		tree.setTree(categories);
+		boolean check = false;
+		Categories fatherCategory = new Categories();
 		
-		// Redirect to the Home page and add missions to the parameters
-		String path = "/WEB-INF/home.html";
-		ServletContext servletContext = getServletContext();
-		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("categories", tree.getRoot());
-		templateEngine.process(path, ctx, response.getWriter());
+		for(Categories category : categories) {
+			if(category.getName().equals(name)) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "category already exists");
+				return;
+			}
+			if(category.getName().equals(father)) {
+				check = true;
+				fatherCategory = category;
+			}
+		}
 		
-	}
-	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		doGet(request, response);
-	}
-	
-	public void destroy() {
+		if(!check) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "father does not exist");
+			return;
+		}
+		
+		int size = 0;
+		
 		try {
-			DBHandler.closeConnection(connection);
+			size = categoriesDAO.index(fatherCategory.getID());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
+		try {
+			categoriesDAO.insertCategories(name, fatherCategory.getCategory() + (size+1));
+			categoriesDAO.insertRelation(categories.size()+1, fatherCategory.getID());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		response.sendRedirect("GoHome");
 	}
+
 }
