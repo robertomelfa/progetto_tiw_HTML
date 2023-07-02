@@ -3,6 +3,11 @@
     <head>
         <link rel="stylesheet" href="CSS/homestyle.css">
         <title>Home Page</title>
+        <style>
+        .bold {
+            font-weight: bold;
+        }
+   	 	</style>
     </head>
     <body>
         <nav id="navbar">
@@ -10,39 +15,47 @@
         <a id="pagetitle">Home Page</a>
         
         <div>
-        	<a href="index.html"> logout  </a>
+        	<a th:href="@{/Logout}">Logout</a>
         </div>
 		
+		<p th:text="${'Benvenuto ' + session.user.name + ' ' + session.user.surname}"></p>
 	
         </nav>
         <div id="treebox">
             <p>Albero</p>
         </div>
 		
-		<div>
+		<div th:unless="${content}">
+			 <ul th:fragment="fragment_category(categories)" >
+	     		<li th:each="c : ${categories.getSubCategories()}" th:inline="text">
+	         		<span th:text="${c.category + ' ' + c.name + '  '}"></span>
+	         		<a th:if="${c.copy}==true" th:href="@{'/CopyCategory?category=' + ${c.category}}">copia</a>
+	         		<ul th:replace="this::fragment_category(${c})"></ul>
+	     		</li>
+	 		</ul>
+		</div>
 		
-		 <ul th:fragment="fragment_category(categories)" >
-     		<li th:each="c : ${categories.getSubCategories()}" th:inline="text">
-         		<span th:text="${c.category + ' ' + c.name + ' >>> '}"></span>
-         		<a href="CopyCategory?id=(c.id}">copia</a>
-         		<ul th:replace="this::fragment_category(${c})"></ul>
-     		</li>
- 		</ul>
+		<div th:if="${content}==true">
+		<a th:href="@{/PasteCategory(id=0, category=${categoriesCopied})}">copia qui</a>
+			 <ul th:fragment="fragment_category2(categories)" >
+	     		<li th:each="c : ${categories.getSubCategories()}" th:inline="text">
+	         		<span th:class="${c.copy}==false ? 'bold' : ''"th:text="${c.category + ' ' + c.name + '  '}"></span>
+	         		<a th:if="${c.copy}==true" th:href="@{/PasteCategory(id=${c.id}, category=${categoriesCopied})}">copia qui</a>
+	         		<ul th:replace="this::fragment_category2(${c})"></ul>
+	     		</li>
+	 		</ul>
 		</div>
 			
-        <div>
+        <div th:unless="${content}">
             <div>
                 <p>Inserisci nuova categoria</p>
 				<form action="AddCategory" method="POST">
 					<input type="text" placeholder = "Nome Categoria" name = "name" id = "name"> <br>
 					<input  type = "text" placeholder = "Nome Padre" name = "father" id ="father"><br>
-					<input  type="submit" value="login">
+					<input  type="submit" value="Aggiungi Categoria">
 				</form>
-				<p id="errormessage" class="error"></p>
-
+				<p style="color: red;" th:text=" ${errorMsg}"></p>
             </div>
         </div>
-
-
     </body>
 </html>

@@ -20,7 +20,7 @@ public class CategoriesDAO {
 
 		List<Categories> categories = new ArrayList<Categories>();
 
-		String query = "SELECT * FROM categories, categoriesRelation WHERE categories.id = categoriesRelation.id ORDER BY categoriesRelation.father, categories.id";
+		String query = "SELECT * FROM categories, categoriesRelation WHERE categories.id = categoriesRelation.id ORDER BY categoriesRelation.father, categories.category";
 		
 		// contiene risultati del database
 		ResultSet result = null;
@@ -114,20 +114,17 @@ public class CategoriesDAO {
 		// ottimizza i tempi di accesso e protezione e per non avere sequel injection
 		PreparedStatement pstatement = null;
 		
+		con.setAutoCommit(false);
+		
 		try {
 			pstatement = con.prepareStatement(query);
 			
 			pstatement.setString(1, category);
 			pstatement.setString(2, name);
 			
-			int rowsAffected = pstatement.executeUpdate();
+			pstatement.executeUpdate();
 
-            // Verifica se l'inserimento è stato eseguito con successo
-            if (rowsAffected > 0) {
-                System.out.println("Inserimento effettuato correttamente.");
-            } else {
-                System.out.println("Nessuna riga inserita.");
-            }
+			con.commit();
 		}catch(SQLException e){
 			throw e;
 		} finally {
@@ -143,6 +140,7 @@ public class CategoriesDAO {
 			} catch (SQLException e2) {
 				throw e2;
 			}
+			con.setAutoCommit(true);
 		}
 	}
 	
@@ -155,20 +153,61 @@ public class CategoriesDAO {
 		// ottimizza i tempi di accesso e protezione e per non avere sequel injection
 		PreparedStatement pstatement = null;
 		
+		con.setAutoCommit(false);
+		
 		try {
 			pstatement = con.prepareStatement(query);
 			
 			pstatement.setInt(1, id);
 			pstatement.setInt(2, father);
 			
-			int rowsAffected = pstatement.executeUpdate();
+			pstatement.executeUpdate();
+			
+			con.commit();
 
-            // Verifica se l'inserimento è stato eseguito con successo
-            if (rowsAffected > 0) {
-                System.out.println("Inserimento effettuato correttamente.");
-            } else {
-                System.out.println("Nessuna riga inserita.");
-            }
+		}catch(SQLException e){
+			throw e;
+		} finally {
+			try {
+				if (result != null)
+					result.close();
+			} catch (SQLException e1) {
+				throw e1;
+			}
+			try {
+				if (pstatement != null)
+					pstatement.close();
+			} catch (SQLException e2) {
+				throw e2;
+			}
+			con.setAutoCommit(true);
+		}
+	}
+	
+	public int getFatherByCategory(String category)throws SQLException{
+		String string="";
+		for(int i = 0; i < category.length()-1; i++) {
+			string = string + category.charAt(i);
+		}
+		
+		String query = "SELECT id FROM categories WHERE categories.category="+string;
+		
+		// contiene risultati del database
+		ResultSet result = null;
+		
+		// ottimizza i tempi di accesso e protezione e per non avere sequel injection
+		PreparedStatement pstatement = null;
+		
+		int father = 0;
+		
+		try {
+			pstatement = con.prepareStatement(query);
+
+			result = pstatement.executeQuery();
+			
+			if(result.next()) {
+				father = result.getInt("id");
+			}
 		}catch(SQLException e){
 			throw e;
 		} finally {
@@ -185,5 +224,67 @@ public class CategoriesDAO {
 				throw e2;
 			}
 		}
+		return father;
+	}
+	
+	public int firstIndexAvaible(int idfather)throws SQLException {
+
+		int index = 0;
+
+		String query = "SELECT category FROM categoriesRelation, categories WHERE categories.id = categoriesRelation.id AND father = " + idfather;
+		
+		// contiene risultati del database
+		ResultSet result = null;
+		
+		// ottimizza i tempi di accesso e protezione e per non avere sequel injection
+		PreparedStatement pstatement = null;
+		
+		try {
+			pstatement = con.prepareStatement(query);
+
+			result = pstatement.executeQuery();
+			List<String> categoryString = new ArrayList<String>();
+			String string;
+			while (result.next()) {
+				string = result.getString("category");
+				categoryString.add(string);	
+			}
+			
+			boolean check = false;
+			
+			for(int i = 1; i < 10; i++) {
+				check = false;
+				for(String string1 : categoryString) {
+					if(i == Integer.parseInt(string1)) {
+						check = true;
+						break;
+					}
+				}
+				if(!check) {
+					index = i;
+					break;
+				}
+			}
+			
+			
+		} catch (SQLException e) {
+			throw e;
+
+		} finally {
+			try {
+				if (result != null)
+					result.close();
+			} catch (SQLException e1) {
+				throw e1;
+			}
+			try {
+				if (pstatement != null)
+					pstatement.close();
+			} catch (SQLException e2) {
+				throw e2;
+			}
+		}
+		
+		return index;
 	}
 }

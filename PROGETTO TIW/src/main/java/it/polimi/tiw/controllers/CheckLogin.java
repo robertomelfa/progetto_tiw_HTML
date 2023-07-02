@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
@@ -46,14 +47,19 @@ public class CheckLogin extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		String name = request.getParameter("username");
+		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		
 		UsersDAO us = new UsersDAO(connection);
 		List<userData> users = new ArrayList<userData>();
+		String path;
 		
-		if(name == null || name.isEmpty() || password == null || password.isEmpty()) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Missing parameter");
+		if(username == null || username.isEmpty() || password == null || password.isEmpty()) {
+			ServletContext servletContext = getServletContext();
+			final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+			ctx.setVariable("errorMsg", "Missing parameter");
+			path = "/index.html";
+			templateEngine.process(path, ctx, response.getWriter());
 			return;
 		}
 		
@@ -61,24 +67,31 @@ public class CheckLogin extends HttpServlet {
 			users = us.findUser();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Issue when reading courses from db");
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Issue when reading users from db");
 			return;
 		}
 	
-		boolean check = false;
+		
+		userData userSession = new userData();
+		userSession = null;
 		
 		for(userData user : users) {
-			if(user.getName().equals(name) && user.getPassword().equals(password)){
-				check = true;
+			if(user.getUsername().equals(username) && user.getPassword().equals(password)){
+				userSession = user;
 			}
 		}
+	
 		
-		if(check == false) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "credentials does not exist");
-			return;
+		if (userSession == null) {
+			ServletContext servletContext = getServletContext();
+			final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+			ctx.setVariable("errorMsg", "Incorrect username or password");
+			path = "/index.html";
+			templateEngine.process(path, ctx, response.getWriter());
+		} else {
+			request.getSession().setAttribute("user", userSession);
+			response.sendRedirect("GoHome");
 		}
-		
-		response.sendRedirect("GoHome");
 	}
 	
 	public void destroy() {

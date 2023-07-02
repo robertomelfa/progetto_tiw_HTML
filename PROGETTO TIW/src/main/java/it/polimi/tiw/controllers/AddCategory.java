@@ -12,8 +12,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
@@ -48,55 +50,77 @@ public class AddCategory extends HttpServlet {
     public AddCategory() {
         super();
     }
-
-
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-		
-	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
+    
+    
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String name = request.getParameter("name");
 		String father = request.getParameter("father");
 		
+		HttpSession session = request.getSession();
+		if (session.getAttribute("user") == null) {
+			response.sendRedirect("index.html");
+			return;
+		}
+		
+		String path;
+		ServletContext servletContext = getServletContext();
+		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
+		
 		
 		if(name == null || name.isEmpty() || father == null || father.isEmpty()) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Missing parameter");
+			response.sendRedirect("GoHome?errorMsg="+"missing parameters");
 			return;
 		}
 		
 		CategoriesDAO categoriesDAO = new CategoriesDAO(connection);
 		List<Categories> categories = new ArrayList<Categories>();
 		
+		// get all the categories of the database
+		
 		try {
 			categories = categoriesDAO.findCategory();
 		}catch (SQLException e) {
 			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Issue when reading courses from db");
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Issue when reading categories from db");
 			return;
 		}
 		
 		boolean check = false;
+		int i = 0;
 		Categories fatherCategory = new Categories();
+		
+		// check if the category already exists (error) and if the father exists
 		
 		for(Categories category : categories) {
 			if(category.getName().equals(name)) {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "category already exists");
+				response.sendRedirect("GoHome?errorMsg=category already exists");
 				return;
 			}
-			if(category.getName().equals(father)) {
+			if(category.getCategory().equals(father)) {
 				check = true;
 				fatherCategory = category;
 			}
 		}
 		
 		if(!check) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "father does not exist");
+			response.sendRedirect("GoHome?errorMsg=father does not exist");
 			return;
 		}
+		
+		// check number of children
+		
+		try {
+			if(categoriesDAO.index(fatherCategory.getID()) >= 9) {
+				response.sendRedirect("GoHome?errorMsg=Can't paste here. Father has already 9 categories");
+				return;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		// add the category in the database
 		
 		int size = 0;
 		
@@ -112,8 +136,17 @@ public class AddCategory extends HttpServlet {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	
 		
 		response.sendRedirect("GoHome");
+	}
+	
+	public void destroy() {
+		try {
+			DBHandler.closeConnection(connection);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

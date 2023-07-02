@@ -2,6 +2,7 @@ package it.polimi.tiw.data;
 
 public class userData {
 	private Integer id;
+	private String username;
 	private String name;
 	private String surname;
 	private String region;
@@ -11,9 +12,10 @@ public class userData {
 		super();
 	}
 	
-	public userData(Integer id, String name, String surname, String region, String password) {
+	public userData(Integer id, String username, String name, String surname, String region, String password) {
 		super();
 		this.id = id;
+		this.username = username;
 		this.name = name;
 		this.password = password;
 		this.surname = surname;
@@ -26,6 +28,14 @@ public class userData {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+	
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	
+	public String getUsername() {
+		return this.username;
 	}
 	
 	public void setName(String name) {

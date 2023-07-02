@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -25,9 +24,8 @@ import it.polimi.tiw.data.Branch;
 import it.polimi.tiw.data.Categories;
 import it.polimi.tiw.utils.DBHandler;
 
-@WebServlet("/GoHome")
-public class GoHome extends HttpServlet{
-	
+@WebServlet("/CopyCategory")
+public class CopyCategory extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	private Connection connection = null;
@@ -43,10 +41,15 @@ public class GoHome extends HttpServlet{
 		
 		connection = DBHandler.getConnection(getServletContext());
 	}
-	
+       
+    
+    public CopyCategory() {
+        super();
+    }
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		String errorMsg = request.getParameter("errorMsg");
+
+		String cat = request.getParameter("category");
 		
 		CategoriesDAO categoriesDAO = new CategoriesDAO(connection);
 		List<Categories> categories = new ArrayList<Categories>();
@@ -65,23 +68,38 @@ public class GoHome extends HttpServlet{
 			return;
 		}
 		
+		boolean check = false;
+		
+		for(Categories category : categories) {
+			check = false;
+			if(category.getCategory().equals(cat)) {
+				category.setCopy();
+			}else if(category.getCategory().length()>cat.length()) {
+				for(int i = 0; i < cat.length(); i++) {
+					if(category.getCategory().charAt(i) != cat.charAt(i)){
+						check = true;
+						break;
+					}
+				}
+				if(!check) {
+					category.setCopy();
+				}
+			}
+		}
+		
 		Branch tree = new Branch();
 		tree.setTree(categories);
 		
 		String path = "/WEB-INF/home.html";
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("content", false);
+		ctx.setVariable("content", true);
 		ctx.setVariable("categories", tree.getRoot());
-		if(errorMsg != null) {
-			ctx.setVariable("errorMsg", errorMsg);
-		}
+		ctx.setVariable("categoriesCopied", cat);
 		templateEngine.process(path, ctx, response.getWriter());
-		
 	}
-	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
 	}
 	
@@ -92,4 +110,5 @@ public class GoHome extends HttpServlet{
 			e.printStackTrace();
 		}
 	}
+
 }

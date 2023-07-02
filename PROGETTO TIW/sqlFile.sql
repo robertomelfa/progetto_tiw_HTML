@@ -2,7 +2,7 @@ CREATE DATABASE  IF NOT EXISTS `progetto_tiw` /*!40100 DEFAULT CHARACTER SET utf
 USE `progetto_tiw`;
 -- MySQL dump 10.13  Distrib 8.0.28, for macos11 (x86_64)
 --
--- Host: 127.0.0.1    Database: dbtest
+-- Host: 127.0.0.1    Database: progetto_tiw
 -- ------------------------------------------------------
 -- Server version	8.0.28
 
@@ -18,7 +18,7 @@ USE `progetto_tiw`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `courses`
+-- Table structure for table `users`
 --
 
 DROP TABLE IF EXISTS `users`;
@@ -26,6 +26,7 @@ DROP TABLE IF EXISTS `users`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
   `id` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(45) NOT NULL,
   `name` varchar(45) NOT NULL,
   `surname` varchar(45) NOT NULL,
   `region` varchar(150) NOT NULL,
@@ -35,17 +36,17 @@ CREATE TABLE `users` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `courses`
+-- Dumping data for table `users`
 --
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'roberto','melfa','lombardia','robi123'),(2,'matteo','maffesi','lombardia','maffo123');
+INSERT INTO `users` VALUES (1,'rob01', 'roberto','melfa','lombardia','robi123'),(2,'teo01','matteo','maffesi','lombardia','maffo123');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `degree`
+-- Table structure for table `categories`
 --
 
 DROP TABLE IF EXISTS `categories`;
@@ -60,7 +61,7 @@ CREATE TABLE `categories` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `degree`
+-- Dumping data for table `categories`
 --
 
 LOCK TABLES `categories` WRITE;
@@ -75,19 +76,19 @@ DROP TABLE IF EXISTS `categoriesRelation`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `categoriesRelation` (
   `id` int NOT NULL,
-  `father` int,
+  `father` int NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (id) REFERENCES categories(id) ON UPDATE CASCADE ON DELETE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `degree`
+-- Dumping data for table `categoriesRelation`
 --
 
 LOCK TABLES `categoriesRelation` WRITE;
 /*!40000 ALTER TABLE `categoriesRelation` DISABLE KEYS */;
-INSERT INTO `categoriesRelation` VALUES (1, null),(2, 1),(3,2),(4,3),(5,4), (6,4), (7,3), (8, 1), (9,3);
+INSERT INTO `categoriesRelation` VALUES (1, 0),(2, 1),(3,2),(4,3),(5,4), (6,4), (7,3), (8, 2), (9,8);
 /*!40000 ALTER TABLE `categoriesRelation` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -106,20 +107,3 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
-
---
--- Dumping events for database 'dbtest'
---
-
---
--- Dumping routines for database 'dbtest'
---
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;

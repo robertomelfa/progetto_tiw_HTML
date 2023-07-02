@@ -36,6 +36,7 @@ public class UsersDAO {
 			while (result.next()) {
 				userData user = new userData();
 				user.setId(result.getInt("id"));
+				user.setUsername(result.getString("username"));
 				user.setName(result.getString("name"));
 				user.setSurname(result.getString("surname"));
 				user.setRegion(result.getString("region"));

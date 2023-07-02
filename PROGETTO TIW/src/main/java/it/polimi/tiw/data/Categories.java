@@ -8,6 +8,7 @@ public class Categories {
 	private String category;
 	private String name;
 	private int father;
+	private boolean copy = true;
 	private List<Categories> subCategories = new ArrayList<Categories>();
 	
 	public Categories() {
@@ -52,5 +53,22 @@ public class Categories {
 	
 	public List<Categories> getSubCategories(){
 		return subCategories;
+	}
+	
+	public void setCopy() {
+		this.copy = false;
+	}
+	
+	public boolean getCopy() {
+		return this.copy;
+	}
+	
+	public boolean contains(String string) {
+		for(int i = 0; i < string.length(); i++) {
+			if(category.charAt(i) != string.charAt(i)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
