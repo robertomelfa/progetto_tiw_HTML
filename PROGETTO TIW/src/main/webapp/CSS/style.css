@@ -1,0 +1,55 @@
+.loginbutton{
+    border-radius: 5px;
+    border-style: solid;
+    width: 210px;
+    height: 30px;
+}
+
+.loginbutton:hover{
+    opacity: 75%;
+    transition: 0.15 ease-in-out;
+    cursor: pointer;
+}
+
+.loginbutton:active{
+	opacity: 50%;
+}
+
+button:active{
+    opacity: 50%;
+}
+
+input{
+    border-radius: 5px;
+    border-style:solid;
+    width: 200px;
+    height: 20px;
+}
+
+.usernamebox{
+    padding-top: 20px;
+    padding-bottom: 10px;
+    
+}
+
+.passwordbox{
+    padding-bottom:20px;
+}
+
+.titlebox{
+    text-align: center;
+}
+
+.pagebox{
+    display: grid;
+    justify-content: center;
+}
+
+.errormessage{
+	text-align: center;
+}
+
+
+
+
+

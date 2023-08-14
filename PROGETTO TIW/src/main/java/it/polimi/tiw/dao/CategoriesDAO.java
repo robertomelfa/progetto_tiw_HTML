@@ -11,28 +11,33 @@ import it.polimi.tiw.data.Categories;
 
 public class CategoriesDAO {
 	private Connection con;
-
+	
+	/**
+	 * 
+	 * @param connection for the DB
+	 */
 	public CategoriesDAO(Connection connection) {
 		this.con = connection;
 	}
-
+	
+	/**
+	 * 
+	 * @return list of categories get from DB
+	 * @throws SQLException
+	 */
 	public List<Categories> findCategory() throws SQLException {
 
 		List<Categories> categories = new ArrayList<Categories>();
 
 		String query = "SELECT * FROM categories, categoriesRelation WHERE categories.id = categoriesRelation.id ORDER BY categoriesRelation.father, categories.category";
 		
-		// contiene risultati del database
 		ResultSet result = null;
-		
-		// ottimizza i tempi di accesso e protezione e per non avere sequel injection
 		PreparedStatement pstatement = null;
+		
 		try {
 			pstatement = con.prepareStatement(query);
-
 			result = pstatement.executeQuery();
 			
-			// muove puntatore avanti di uno
 			while (result.next()) {
 				Categories category = new Categories();
 				category.setId(result.getInt("id"));
@@ -62,27 +67,29 @@ public class CategoriesDAO {
 		return categories;
 	}
 	
+	/**
+	 * 
+	 * @param idfather is the id of the category "father" (where to copy others)
+	 * @return the size of sub categories in father
+	 * @throws SQLException
+	 */
 	public int index(int idfather)throws SQLException {
 
 		int size = 0;
 
-		String query = "SELECT COUNT(*) FROM categoriesRelation WHERE father = " + idfather;
+		String query = "SELECT COUNT(*) FROM categoriesRelation WHERE father = ?";
 		
-		// contiene risultati del database
 		ResultSet result = null;
-		
-		// ottimizza i tempi di accesso e protezione e per non avere sequel injection
 		PreparedStatement pstatement = null;
 		
 		try {
 			pstatement = con.prepareStatement(query);
-
+			pstatement.setInt(1, idfather);
 			result = pstatement.executeQuery();
 			
 			if(result.next()) {
 				size = result.getInt(1);
 			}
-			
 			
 		} catch (SQLException e) {
 			throw e;
@@ -105,13 +112,16 @@ public class CategoriesDAO {
 		return size;
 	}
 	
+	/**
+	 * 
+	 * @param name of the category to insert in the DB
+	 * @param category of the category to insert in DB
+	 * @throws SQLException
+	 */
 	public void insertCategories(String name, String category) throws SQLException{
 		String query = "INSERT INTO categories(category, name) VALUES (?, ?)";
 		
-		// contiene risultati del database
 		ResultSet result = null;
-		
-		// ottimizza i tempi di accesso e protezione e per non avere sequel injection
 		PreparedStatement pstatement = null;
 		
 		con.setAutoCommit(false);
@@ -144,13 +154,16 @@ public class CategoriesDAO {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param id of the category to insert in the table
+	 * @param father of the category to insert in the table
+	 * @throws SQLException
+	 */
 	public void insertRelation(Integer id, Integer father) throws SQLException{
 		String query = "INSERT INTO categoriesRelation(id, father) VALUES (?, ?)";
 		
-		// contiene risultati del database
 		ResultSet result = null;
-		
-		// ottimizza i tempi di accesso e protezione e per non avere sequel injection
 		PreparedStatement pstatement = null;
 		
 		con.setAutoCommit(false);
@@ -184,24 +197,28 @@ public class CategoriesDAO {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param category the category we want to find the father
+	 * @return the id of the father
+	 * @throws SQLException
+	 */
 	public int getFatherByCategory(String category)throws SQLException{
 		String string="";
 		for(int i = 0; i < category.length()-1; i++) {
 			string = string + category.charAt(i);
 		}
 		
-		String query = "SELECT id FROM categories WHERE categories.category="+string;
+		String query = "SELECT id FROM categories WHERE categories.category = ?";
 		
-		// contiene risultati del database
 		ResultSet result = null;
-		
-		// ottimizza i tempi di accesso e protezione e per non avere sequel injection
 		PreparedStatement pstatement = null;
 		
 		int father = 0;
 		
 		try {
 			pstatement = con.prepareStatement(query);
+			pstatement.setString(1, string);
 
 			result = pstatement.executeQuery();
 			
@@ -227,20 +244,24 @@ public class CategoriesDAO {
 		return father;
 	}
 	
+	/**
+	 * 
+	 * @param idfather category father
+	 * @return the first index avaible in the sub categories of father
+	 * @throws SQLException
+	 */
 	public int firstIndexAvaible(int idfather)throws SQLException {
 
 		int index = 0;
 
-		String query = "SELECT category FROM categoriesRelation, categories WHERE categories.id = categoriesRelation.id AND father = " + idfather;
+		String query = "SELECT category FROM categoriesRelation, categories WHERE categories.id = categoriesRelation.id AND father = ?";
 		
-		// contiene risultati del database
 		ResultSet result = null;
-		
-		// ottimizza i tempi di accesso e protezione e per non avere sequel injection
 		PreparedStatement pstatement = null;
 		
 		try {
 			pstatement = con.prepareStatement(query);
+			pstatement.setInt(1, idfather);
 
 			result = pstatement.executeQuery();
 			List<String> categoryString = new ArrayList<String>();
@@ -266,7 +287,6 @@ public class CategoriesDAO {
 				}
 			}
 			
-			
 		} catch (SQLException e) {
 			throw e;
 
@@ -287,4 +307,7 @@ public class CategoriesDAO {
 		
 		return index;
 	}
+	
+	
+	
 }

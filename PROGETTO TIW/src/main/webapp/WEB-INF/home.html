@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
-        <link rel="stylesheet" href="CSS/homestyle.css">
         <title>Home Page</title>
         <style>
         .bold {
@@ -19,6 +18,8 @@
         </div>
 		
 		<p th:text="${'Benvenuto ' + session.user.name + ' ' + session.user.surname}"></p>
+		
+		<p style="color: red;" th:text=" ${errorMsg}"></p>
 	
         </nav>
         <div id="treebox">
@@ -51,10 +52,9 @@
                 <p>Inserisci nuova categoria</p>
 				<form action="AddCategory" method="POST">
 					<input type="text" placeholder = "Nome Categoria" name = "name" id = "name"> <br>
-					<input  type = "text" placeholder = "Nome Padre" name = "father" id ="father"><br>
+					<input  type="number" placeholder = "Categoria Padre" name = "father" id ="father" min = 1><br>
 					<input  type="submit" value="Aggiungi Categoria">
 				</form>
-				<p style="color: red;" th:text=" ${errorMsg}"></p>
             </div>
         </div>
     </body>

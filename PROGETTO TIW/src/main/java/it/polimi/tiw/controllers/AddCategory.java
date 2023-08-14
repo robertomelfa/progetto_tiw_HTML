@@ -34,7 +34,10 @@ public class AddCategory extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	private Connection connection = null;
-
+	
+	/**
+	 * Initialize the connection with DB and Template thymeleaf
+	 */
 	public void init() throws ServletException {
 		
 		ServletContext servletContext = getServletContext();
@@ -47,15 +50,21 @@ public class AddCategory extends HttpServlet {
 		connection = DBHandler.getConnection(getServletContext());
 	}
 	
+	/**
+	 * Constructor of the class
+	 */
     public AddCategory() {
         super();
     }
     
-    
+    /**
+     * What the class do after the submit of the form
+     */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String name = request.getParameter("name");
 		String father = request.getParameter("father");
 		
+		// check if the session is active
 		HttpSession session = request.getSession();
 		if (session.getAttribute("user") == null) {
 			response.sendRedirect("index.html");
@@ -66,7 +75,7 @@ public class AddCategory extends HttpServlet {
 		ServletContext servletContext = getServletContext();
 		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
 		
-		
+		// check if parameter are not null
 		if(name == null || name.isEmpty() || father == null || father.isEmpty()) {
 			response.sendRedirect("GoHome?errorMsg="+"missing parameters");
 			return;
@@ -102,6 +111,7 @@ public class AddCategory extends HttpServlet {
 			}
 		}
 		
+		// check if the father exists
 		if(!check) {
 			response.sendRedirect("GoHome?errorMsg=father does not exist");
 			return;
@@ -137,10 +147,13 @@ public class AddCategory extends HttpServlet {
 			e.printStackTrace();
 		}
 	
-		
+		// return to home
 		response.sendRedirect("GoHome");
 	}
 	
+	/**
+	 * Close connection with the DB
+	 */
 	public void destroy() {
 		try {
 			DBHandler.closeConnection(connection);

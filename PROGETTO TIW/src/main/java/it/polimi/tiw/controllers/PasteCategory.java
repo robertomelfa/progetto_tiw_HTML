@@ -30,7 +30,10 @@ public class PasteCategory extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	private Connection connection = null;
-
+	
+	/**
+	 * Initialize the connection with the DB and the template for thymeleaf
+	 */
 	public void init() throws ServletException {
 		
 		ServletContext servletContext = getServletContext();
@@ -43,25 +46,33 @@ public class PasteCategory extends HttpServlet {
 		connection = DBHandler.getConnection(getServletContext());
 	}
 	
+	/**
+	 * Constructor of the class
+	 */
     public PasteCategory() {
         super();
     }
 
-	
+	/**
+	 * Method doGet: paste the categories copied in the DB
+	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		Integer id  = Integer.parseInt(request.getParameter("id"));
 		String cat = request.getParameter("category");
 		
+		
 		CategoriesDAO categoriesDAO = new CategoriesDAO(connection);
 		List<Categories> categories = new ArrayList<Categories>();
 		
+		// check if session is active
 		HttpSession session = request.getSession();
 		if (session.getAttribute("user") == null) {
 			response.sendRedirect("index.html");
 			return;
 		}
 		
+		// get catagories from DB
 		try {
 			categories = categoriesDAO.findCategory();
 		}catch (SQLException e) {
@@ -77,10 +88,25 @@ public class PasteCategory extends HttpServlet {
 		
 		// search where to copy the list of categories
 		
+		boolean check_cat = false;
+		boolean check_father = false;
+		
+		if(id == 0) {
+			check_father = true;
+		}
 		for(Categories category : categories) {
 			if(category.getID() == id) {
 				father = category;
+				check_father = true;
 			}
+			if(category.getCategory().equals(cat)) {
+				check_cat = true;
+			}
+		}
+		
+		if(check_cat == false || check_father == false) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Category not found");
+			return;
 		}
 		
 		
@@ -97,6 +123,7 @@ public class PasteCategory extends HttpServlet {
 		}
 		
 		
+		// calculate new id, category for the categories to copy, then insert in the DB
 		int j = 1;
 		
 		for(Categories category : categories) {
@@ -160,16 +187,21 @@ public class PasteCategory extends HttpServlet {
 			}
 		}
 	
-		
+		// redirect to home
 		response.sendRedirect("GoHome");
 	}
 
-	
+	/**
+	 * Method doPost: call doGet
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		doGet(request, response);
 	}
 	
+	/**
+	 * Close connection with DB
+	 */
 	public void destroy() {
 		try {
 			DBHandler.closeConnection(connection);

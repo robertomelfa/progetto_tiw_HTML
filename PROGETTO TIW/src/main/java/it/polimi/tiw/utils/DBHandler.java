@@ -5,6 +5,12 @@ import javax.servlet.*;
 
 public class DBHandler {
 	
+	/**
+	 * 
+	 * @param context Servlet context
+	 * @return the connection with DB
+	 * @throws UnavailableException
+	 */
 	public static Connection getConnection(ServletContext context) throws UnavailableException {
 		Connection connection = null;
 		try {
@@ -21,7 +27,12 @@ public class DBHandler {
 		}
 		return connection;
 	}
-
+	 
+	/**
+	 * Close the connection
+	 * @param connection
+	 * @throws SQLException
+	 */
 	public static void closeConnection(Connection connection) throws SQLException {
 		if (connection != null) {
 			connection.close();

@@ -11,28 +11,33 @@ import it.polimi.tiw.data.userData;
 
 public class UsersDAO {
 	private Connection con;
-
+	
+	/**
+	 * Constructor of the class
+	 * @param connection is the connection with DB
+	 */
 	public UsersDAO(Connection connection) {
 		this.con = connection;
 	}
-
+	
+	/**
+	 * 
+	 * @return the list of users from DB
+	 * @throws SQLException
+	 */
 	public List<userData> findUser() throws SQLException {
 
 		List<userData> users = new ArrayList<userData>();
 
 		String query = "SELECT * FROM users";
 		
-		// contiene risultati del database
 		ResultSet result = null;
-		
-		// ottimizza i tempi di accesso e protezione e per non avere sequel injection
 		PreparedStatement pstatement = null;
 		try {
 			pstatement = con.prepareStatement(query);
 
 			result = pstatement.executeQuery();
 			
-			// muove puntatore avanti di uno
 			while (result.next()) {
 				userData user = new userData();
 				user.setId(result.getInt("id"));

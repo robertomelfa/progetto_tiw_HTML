@@ -25,13 +25,20 @@ import it.polimi.tiw.data.Branch;
 import it.polimi.tiw.data.Categories;
 import it.polimi.tiw.utils.DBHandler;
 
+
+/**
+ * Servlet implementation class GoHome
+ */
 @WebServlet("/GoHome")
 public class GoHome extends HttpServlet{
 	
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	private Connection connection = null;
-
+	
+	/**
+	 * Method that initialize the connection with the DB
+	 */
 	public void init() throws ServletException {
 		
 		ServletContext servletContext = getServletContext();
@@ -44,6 +51,9 @@ public class GoHome extends HttpServlet{
 		connection = DBHandler.getConnection(getServletContext());
 	}
 	
+	/**
+	 * Mwthod doGet: return to the home with the updated tree
+	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		String errorMsg = request.getParameter("errorMsg");
@@ -51,12 +61,14 @@ public class GoHome extends HttpServlet{
 		CategoriesDAO categoriesDAO = new CategoriesDAO(connection);
 		List<Categories> categories = new ArrayList<Categories>();
 		
+		// check if the session is active
 		HttpSession session = request.getSession();
 		if (session.getAttribute("user") == null) {
 			response.sendRedirect("index.html");
 			return;
 		}
 		
+		// set the tree from the categories in the DB
 		try {
 			categories = categoriesDAO.findCategory();
 		}catch (SQLException e) {
@@ -67,6 +79,8 @@ public class GoHome extends HttpServlet{
 		
 		Branch tree = new Branch();
 		tree.setTree(categories);
+		
+		// return to home with the tree updated
 		
 		String path = "/WEB-INF/home.html";
 		ServletContext servletContext = getServletContext();
@@ -80,11 +94,17 @@ public class GoHome extends HttpServlet{
 		
 	}
 	
+	/**
+	 * Method doPost: call doGet
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		doGet(request, response);
 	}
 	
+	/**
+	 * Close connection with DB
+	 */
 	public void destroy() {
 		try {
 			DBHandler.closeConnection(connection);

@@ -1,19 +1,26 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-	<link rel="stylesheet" type="text/css" media="all" href="css/loginstyle.css"/>
-	<meta charset="ISO-8859-1">
-	
-	<title>Login Page</title>
-</head>
-<body>
-	<h1>Benvenuti nel sito</h1>
-	<p>Inserisci username e password</p>
-	<form action="CheckLogin" method="POST">
-		<input type="text" placeholder = "username" name = "username" id = "username"> <br>
-		<input  type = "text" placeholder = "password" name = "password" id ="password"><br>
-		<input  type="submit" value="login">
-	</form>
-	<p style="color: red;" th:text=" ${errorMsg}"></p>
-</body>
+    <head>
+        <link rel="stylesheet" type="text/css" media="all" href="CSS/style.css"/>
+		<meta charset="ISO-8859-1">
+        <title>Login</title>
+    </head>
+    <body>
+        <div class="titlebox"><h1>Login Page</h1></div>
+        <form action="CheckLogin" method="POST">
+			<fieldset>
+			<div class=pagebox>
+            <div class="usernamebox">
+                <input type="text" placeholder="Username" name="username" required>
+            </div>
+            <div class="passwordbox">
+                <input type="password" placeholder="Password" name="password" required>
+            </div>
+            <div>
+                <input type="submit" class="loginbutton" value="Login">
+            </div>
+            <p style="color: red;" th:text=" ${errorMsg}"></p>
+        </div>
+		</fieldset></form>
+    </body>
 </html>

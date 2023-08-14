@@ -66,7 +66,7 @@ CREATE TABLE `categories` (
 
 LOCK TABLES `categories` WRITE;
 /*!40000 ALTER TABLE `categories` DISABLE KEYS */;
-INSERT INTO `categories` VALUES (1, '9','materiali solidi'),(2, '91','materiali inerti'),(3,'911','inerti da edilizia'),(4,'9111','amianto'),(5,'91111','amianto in lastre'), (6, '91112','amianto in frammenti'), (7, '9112','materiali cementizi'), (8, '912','inerti ceramici'), (9, '9121','piastrelle');
+INSERT INTO `categories` VALUES (1, '9','materiali solidi'),(2, '91','materiali inerti'),(3,'911','inerti da edilizia'),(4,'9111','amianto'),(5,'91111','amianto in lastre'), (6, '91112','amianto in frammenti'), (7, '9112','materiali cementizi'), (8, '912','inerti ceramici'), (9, '9121','piastrelle'), (10, '9122', 'sanitari'), (11, '92', 'materiali ferrosi');
 /*!40000 ALTER TABLE `categories` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -88,7 +88,7 @@ CREATE TABLE `categoriesRelation` (
 
 LOCK TABLES `categoriesRelation` WRITE;
 /*!40000 ALTER TABLE `categoriesRelation` DISABLE KEYS */;
-INSERT INTO `categoriesRelation` VALUES (1, 0),(2, 1),(3,2),(4,3),(5,4), (6,4), (7,3), (8, 2), (9,8);
+INSERT INTO `categoriesRelation` VALUES (1, 0),(2, 1),(3,2),(4,3),(5,4), (6,4), (7,3), (8, 2), (9,8), (10, 8), (11, 1);
 /*!40000 ALTER TABLE `categoriesRelation` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -107,3 +107,4 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+

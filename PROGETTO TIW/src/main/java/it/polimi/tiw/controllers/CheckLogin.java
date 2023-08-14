@@ -1,15 +1,12 @@
 package it.polimi.tiw.controllers;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.UnavailableException;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -32,7 +29,10 @@ public class CheckLogin extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private TemplateEngine templateEngine;
 	private Connection connection = null;
-
+	
+	/**
+	 * Initialize the connection with the DB
+	 */
 	public void init() throws ServletException {
 		
 		ServletContext servletContext = getServletContext();
@@ -44,7 +44,10 @@ public class CheckLogin extends HttpServlet {
 		
 		connection = DBHandler.getConnection(getServletContext());
 	}
-
+	
+	/**
+	 * Method called after the submit of the form, check the credential of the user
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		String username = request.getParameter("username");
@@ -54,6 +57,7 @@ public class CheckLogin extends HttpServlet {
 		List<userData> users = new ArrayList<userData>();
 		String path;
 		
+		// check if the parameter are null
 		if(username == null || username.isEmpty() || password == null || password.isEmpty()) {
 			ServletContext servletContext = getServletContext();
 			final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
@@ -63,6 +67,7 @@ public class CheckLogin extends HttpServlet {
 			return;
 		}
 		
+		// find all users from database
 		try {
 			users = us.findUser();
 		} catch (SQLException e) {
@@ -71,7 +76,7 @@ public class CheckLogin extends HttpServlet {
 			return;
 		}
 	
-		
+		// check if the credentials exists in the DB
 		userData userSession = new userData();
 		userSession = null;
 		
@@ -80,7 +85,7 @@ public class CheckLogin extends HttpServlet {
 				userSession = user;
 			}
 		}
-	
+		
 		
 		if (userSession == null) {
 			ServletContext servletContext = getServletContext();
@@ -94,6 +99,9 @@ public class CheckLogin extends HttpServlet {
 		}
 	}
 	
+	/**
+	 * Close connection with DB
+	 */
 	public void destroy() {
 		try {
 			DBHandler.closeConnection(connection);

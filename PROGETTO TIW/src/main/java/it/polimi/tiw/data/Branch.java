@@ -8,14 +8,25 @@ public class Branch{
 	
 	private Categories root;
 	
+	/**
+	 * Constructor of the class
+	 */
 	public Branch() {
 		this.root = new Categories();
 	}
 	
+	/**
+	 * 
+	 * @return the root of the tree
+	 */
 	public Categories getRoot() {
 		return root;
 	}
 	
+	/**
+	 * Set the tree
+	 * @param categoriesList list of categories to insert in the tree
+	 */
 	public void setTree(List<Categories> categoriesList) {
 		Map<Integer, Categories> categoriesMap = new HashMap<>();
 
@@ -35,4 +46,5 @@ public class Branch{
 			}
 		}
 	}
+
 }
